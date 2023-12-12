@@ -32,6 +32,11 @@ int wifiLoops = 0; //
 const char* ssid     = "MGTS_GPON_1178";
 const char* password = "K1V03ZUV";
 
+// Wi-Fi Client
+WiFiClient client;
+IPAddress BACKEND_IP(188,120,249,76);
+const int BACKEND_PORT = 8080; 
+
 
 void setup() {
   // put your setup code here, to run once:
@@ -84,6 +89,32 @@ void loop() {
     }else{
       Serial.printf("WiFi connected!\n");
       wifiLoops=0;
+
+      //----- SEND REQUEST -----
+      //client.stop();
+      if (client.connect(BACKEND_IP, BACKEND_PORT)) {
+        client.printf("GET /cat-%.2f HTTP/1.1\n",tempSt);
+        client.println("Host: www.arduino.cc");
+        client.println("User-Agent: ArduinoWiFi/1.1");
+        client.println("Connection: close");
+        client.println();
+        delay(2000);
+        // Read        
+        while (client.available()) {
+          char c = client.read();
+          Serial.write(c);
+          //String c = client.readString();
+          //Serial.print(c);
+        } 
+        // Close        
+        client.flush();
+        client.stop();
+        Serial.println("client sent");    
+      }else{
+        Serial.println("client connection failed");    
+      }
+      //--------------------------------------
+
       WiFi.disconnect();
     }
 
