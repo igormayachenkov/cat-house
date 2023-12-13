@@ -35,7 +35,8 @@ const char* password = "K1V03ZUV";
 // Wi-Fi Client
 WiFiClient client;
 IPAddress BACKEND_IP(188,120,249,76);
-const int BACKEND_PORT = 8080; 
+//IPAddress BACKEND_IP(192,168,1,68);
+const int BACKEND_PORT = 8888; 
 
 
 void setup() {
@@ -93,12 +94,8 @@ void loop() {
       //----- SEND REQUEST -----
       //client.stop();
       if (client.connect(BACKEND_IP, BACKEND_PORT)) {
-        client.printf("GET /cat-%.2f HTTP/1.1\n",tempSt);
-        client.println("Host: www.arduino.cc");
-        client.println("User-Agent: ArduinoWiFi/1.1");
-        client.println("Connection: close");
-        client.println();
-        delay(2000);
+        client.printf("tempSt:%.2f tempHm:%.2f heating:%d",tempSt,tempHm,heating);
+        delay(5000);
         // Read        
         while (client.available()) {
           char c = client.read();
@@ -109,7 +106,7 @@ void loop() {
         // Close        
         client.flush();
         client.stop();
-        Serial.println("client sent");    
+        Serial.println("\ndata sent");    
       }else{
         Serial.println("client connection failed");    
       }
