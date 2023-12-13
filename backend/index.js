@@ -24,11 +24,13 @@ const server = net.createServer((socket) => {
         // socket.write("</body></html>\r\n");
 
         socket.end();
+        socket.destroy();
     });
 
-    socket.on('end', () => {
-        console.log(new Date().toISOString()+' client disconnected');
+    socket.on('close', () => {
+        console.log('close');
     });
+
 });
 
 server.on('error', (err) => {
