@@ -25,7 +25,7 @@ float hysteresis = 0.5;
 float tempOn;  // low  bound
 float tempOff; // high bound
 void setTarget(float newTarget){
-  if(newTarget<0 || newTarget>15) return
+  if(newTarget<0 || newTarget>15) return;
   tempTarget = newTarget;
   tempOn  = tempTarget - hysteresis; // low  bound
   tempOff = tempTarget + hysteresis; // high bound
