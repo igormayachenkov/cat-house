@@ -13,17 +13,23 @@ void setHeating(bool val){
 }
 
 // Temperature measurement
-OneWire wireSt(13);
-OneWire wireHm(27);
+OneWire wireA(13);
+OneWire wireB(27);
 
-DallasTemperature sensorsSt(&wireSt);
-DallasTemperature sensorsHm(&wireHm);
+DallasTemperature sensA(&wireA);
+DallasTemperature sensB(&wireB);
 
 // Heater control
-float tempTarget = 20.0;
+float tempTarget;
 float hysteresis = 0.5;
-float tempOn  = tempTarget - hysteresis; // low  bound
-float tempOff = tempTarget + hysteresis; // high bound
+float tempOn;  // low  bound
+float tempOff; // high bound
+void setTarget(float newTarget){
+  if(newTarget<0 || newTarget>15) return
+  tempTarget = newTarget;
+  tempOn  = tempTarget - hysteresis; // low  bound
+  tempOff = tempTarget + hysteresis; // high bound
+}
 
 // Wi-Fi and Timing
 const int WIFI_LOOP = 3; // MAX number of the main loops
@@ -38,42 +44,44 @@ IPAddress BACKEND_IP(188,120,249,76);
 //IPAddress BACKEND_IP(192,168,1,68);
 const int BACKEND_PORT = 8888; 
 
-
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
+
+  // Target T
+  setTarget(5.0);
 
   // Init output pins
   pinMode(HEATER_PIN,OUTPUT);
   setHeating(true);
 
   // Start the DS18B20 sensor
-  sensorsSt.begin();
-  sensorsHm.begin();
+  sensA.begin();
+  sensB.begin();
 
 }
 
 void loop() {
 
   // Measure Temperature
-  sensorsSt.requestTemperatures(); 
-  sensorsHm.requestTemperatures(); 
-  float tempSt = sensorsSt.getTempCByIndex(0);
-  float tempHm = sensorsHm.getTempCByIndex(0);
+  sensA.requestTemperatures(); 
+  sensB.requestTemperatures(); 
+  float tempA = sensA.getTempCByIndex(0);
+  float tempB = sensB.getTempCByIndex(0);
 
   // Control HEATER
-  if(tempSt<tempOn && !heating){
+  if(tempA<tempOn && !heating){
     setHeating(true);
   }
-  if(tempSt>tempOff && heating){
+  if(tempA>tempOff && heating){
     setHeating(false);
   }
 
   // Console output
   Serial.print("Temp C: ");
-  Serial.print(tempSt);
+  Serial.print(tempA);
   Serial.print(" ");
-  Serial.print(tempHm);
+  Serial.print(tempB);
   Serial.print("   target: ");
   Serial.print(tempTarget);
   Serial.print(" => heating: ");
@@ -94,14 +102,18 @@ void loop() {
       //----- SEND REQUEST -----
       //client.stop();
       if (client.connect(BACKEND_IP, BACKEND_PORT)) {
-        client.printf("tempSt:%.2f tempHm:%.2f heating:%d",tempSt,tempHm,heating);
+        client.printf(
+          "tempA:%.2f tempTarget:%.2f heating:%d tempB:%.2f",
+          tempA,tempTarget,heating,tempB);
         delay(5000);
         // Read        
         while (client.available()) {
-          char c = client.read();
-          Serial.write(c);
-          //String c = client.readString();
-          //Serial.print(c);
+          // char c = client.read();
+          // Serial.write(c);
+          String str = client.readString();
+          Serial.print(str);
+          int newTarget = str.toInt();
+          setTarget(newTarget);
         } 
         // Close        
         client.flush();

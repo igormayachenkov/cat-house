@@ -12,7 +12,7 @@ const server = net.createServer((socket) => {
     socket.on('data', (data) => {
         console.log('data', data.toString());
 
-        socket.write('hello');
+        socket.write('13');
 
         // socket.write("HTTP/1.1 200 OK\n");
         // socket.write("Content-Type: text/html\n");
