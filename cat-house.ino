@@ -24,19 +24,21 @@ float tempTarget;
 float hysteresis = 0.5;
 float tempOn;  // low  bound
 float tempOff; // high bound
-void setTarget(float newTarget){
+void setTarget(int newTarget){
   if(newTarget<0 || newTarget>15) return;
-  tempTarget = newTarget;
+  tempTarget = static_cast<float>(newTarget);
   tempOn  = tempTarget - hysteresis; // low  bound
   tempOff = tempTarget + hysteresis; // high bound
 }
 
 // Wi-Fi and Timing
-const int WIFI_LOOP = 3; // MAX number of the main loops
 const int MAIN_LOOP = 10000; // ms
-int wifiLoops = 0; // 
-const char* ssid     = "MGTS_GPON_1178";
-const char* password = "K1V03ZUV";
+const int WIFI_LOOP = 15*16; // MAX number of the main loops
+int wifiLoops = WIFI_LOOP; // 
+//const char* ssid     = "MGTS_GPON_1178";
+//const char* password = "K1V03ZUV";
+const char* ssid     = "HUAWEI-B310-B45E";
+const char* password = "TLNQA0HLTAE";
 
 // Wi-Fi Client
 WiFiClient client;
@@ -49,7 +51,7 @@ void setup() {
   Serial.begin(115200);
 
   // Target T
-  setTarget(5.0);
+  setTarget(5);
 
   // Init output pins
   pinMode(HEATER_PIN,OUTPUT);
