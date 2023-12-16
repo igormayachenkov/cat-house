@@ -33,7 +33,7 @@ void setTarget(int newTarget){
 
 // Wi-Fi and Timing
 const int MAIN_LOOP = 10000; // ms
-const int WIFI_LOOP = 15*16; // MAX number of the main loops
+const int WIFI_LOOP = 15*6; // MAX number of the main loops
 int wifiLoops = WIFI_LOOP; // 
 //const char* ssid     = "MGTS_GPON_1178";
 //const char* password = "K1V03ZUV";
