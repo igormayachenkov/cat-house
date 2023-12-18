@@ -21,14 +21,15 @@ try{
 
     // START SERVER
     const server = net.createServer((socket) => {
-        let ip = socket.remoteAddress?.replace(/^.*:/, '') 
-        console.log(
-            new Date().toISOString()+" "
-            + socket.remoteAddress?.replace(/^.*:/, '').padStart(15, ' ') 
-        )
 
         socket.on('data', (data) => {
-            console.log('data', data.toString());
+            
+            let ip = socket.remoteAddress?.replace(/^.*:/, '') 
+            console.log(
+                new Date().toISOString()+" "
+                + socket.remoteAddress?.replace(/^.*:/, '').padStart(15, ' ') +"   "
+                + data.toString()
+            )
 
             socket.write('7');
 
@@ -46,7 +47,7 @@ try{
         });
 
         socket.on('close', () => {
-            console.log('close');
+            //console.log('close');
         });
 
     });
