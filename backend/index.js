@@ -2,6 +2,7 @@ const net                   = require("node:net")
 const { Database }          = require("./database.js")
 const { verifyDatabase }    = require("./db-verification.js")
 const { tables }            = require("./db-scheme.js")
+const { processRequest }    = require("./domain.js")
 
 
 async function main(){
@@ -22,25 +23,9 @@ try{
     // START SERVER
     const server = net.createServer((socket) => {
 
-        socket.on('data', (data) => {
+        socket.on('data', async (data) => {
             
-            let ip = socket.remoteAddress?.replace(/^.*:/, '') 
-            console.log(
-                new Date().toISOString()+" "
-                + socket.remoteAddress?.replace(/^.*:/, '').padStart(15, ' ') +"   "
-                + data.toString()
-            )
-
-            socket.write('7');
-
-            // socket.write("HTTP/1.1 200 OK\n");
-            // socket.write("Content-Type: text/html\n");
-            // socket.write("Connection: close\n");
-            // socket.write("\n");
-            // socket.write("<!DOCTYPE HTML>\n");
-            // socket.write("<html><body>\r\n");
-            // socket.write("<h1>hello</h1>\r\n");
-            // socket.write("</body></html>\r\n");
+            processRequest(socket, "tempA:7.50 tempTarget:7.00 heating:0 tempB:1.81")//data);
 
             socket.end();
             socket.destroy();
