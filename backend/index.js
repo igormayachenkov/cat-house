@@ -32,6 +32,10 @@ try{
             socket.destroy();
         });
 
+        socket.on('error', (err) => {
+            console.log('socket error:',err);
+        });
+
         socket.on('close', () => {
             //console.log('close');
         });
