@@ -23,14 +23,16 @@ try{
     // START SERVER
     const server = net.createServer((socket) => {
 
-        socket.on('data', async (body) => {
-            
-            //processRequest(socket, "tempA:7.50 tempTarget:7.00 heating:0 tempB:1.81")//data);
-            processRequest(socket, body);
+        socket.on('data', (body) => { // do not async !
+            console.log(`onData length: ${body.length}`)
 
-            socket.end();
-            socket.destroy();
-        });
+            //processRequest (socket, "tempA:7.50 tempTarget:7.00 heating:0 tempB:1.81")//data);
+            processRequest(socket, body)
+                .finally(()=>{
+                    socket.end();
+                    socket.destroy();
+                })
+        })
 
         socket.on('error', (err) => {
             console.log('socket error:',err);

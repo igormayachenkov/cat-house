@@ -1,10 +1,14 @@
-exports.processRequest = async function(socket, body){
+exports.processRequest = async function(socket, bodyBuffer){
     // PARSE and VERIFY REQUEST (body : Buffer)
     // tempA:7.50 tempTarget:7.00 heating:0 tempB:1.81
+    const time = new Date().getTime()
     let success = false
     responce = ""
+    const body  = bodyBuffer.toString('utf8', 0, 160)// limit body size
+        .replace(/\r|\n/g," ")
+    const ip = socket.remoteAddress?.replace(/^.*:/, '')
     try{
-        const parts = body.toString().split(" ")
+        const parts = body.split(" ")
         if(parts.length!=4) throw "wrong data"
 
         let data = {}
@@ -24,6 +28,8 @@ exports.processRequest = async function(socket, body){
     }catch(e){
         // Incorrect request
         responce = "13"
+        // Save the hacker
+        await db.query(`INSERT INTO hackers (time,ip,body) VALUES(${time},'${ip}','${body}')`)
     }
 
     //  WRITE RESPONSE
@@ -31,8 +37,8 @@ exports.processRequest = async function(socket, body){
 
     // LOG REQUEST
     console.log(
-        new Date().toISOString()+" "
-        + socket.remoteAddress?.replace(/^.*:/, '').padStart(15, ' ') +"   "
+        new Date(time).toISOString()+" "
+        + ip.padStart(15, ' ') +"  "
         + body.toString()
         + (success ? (' => '+responce) : "")
     )

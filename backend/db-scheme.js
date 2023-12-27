@@ -15,4 +15,11 @@ exports.tables = {
         }, 
         primary_key:  'wsid,module'
     },
+    'hackers'   : {
+        fields:{
+            time:     'BIGINT NOT NULL',
+            ip:       'VARCHAR(16) NOT NULL',
+            body:     'VARCHAR(255) NOT NULL'
+        }, 
+    },
 };
