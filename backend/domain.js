@@ -3,7 +3,9 @@ exports.processRequest = async function(socket, bodyBuffer){
     // tempA:7.50 tempTarget:7.00 heating:0 tempB:1.81
     const time = new Date().getTime()
     let success = false
-    responce = ""
+    let sql = null
+    let responce = ""
+
     const body  = bodyBuffer.toString('utf8', 0, 160)// limit body size
         .replace(/\r|\n/g," ")
     const ip = socket.remoteAddress?.replace(/^.*:/, '')
@@ -18,8 +20,12 @@ exports.processRequest = async function(socket, bodyBuffer){
         readValue(parts[2], "heating",   Number.parseInt,   data) 
         readValue(parts[3], "tempB",     Number.parseFloat, data) 
 
+        let reason = 2;// Log reason (1:start, 2:timer, 3:change)
+
         // Save in the database
-        //console.log(data)
+        sql = 
+            `INSERT INTO sensors (time,ip,tempA,tempTarget,heating,tempB,reason) `
+          + `VALUES(${time},'${ip}',${data.tempA},${data.tempTarget},${data.heating},${data.tempB},${reason})`
 
         // Set responce
         responce = "7"
@@ -29,7 +35,14 @@ exports.processRequest = async function(socket, bodyBuffer){
         // Incorrect request
         responce = "13"
         // Save the hacker
-        await db.query(`INSERT INTO hackers (time,ip,body) VALUES(${time},'${ip}','${body}')`)
+        sql = `INSERT INTO hackers (time,ip,body) VALUES(${time},'${ip}','${body}')`
+    }
+
+    // SAVE IN THE DATABASE
+    try{
+        await db.query(sql);
+    }catch(e){
+        console.log('db saving error, sql: '+sql)
     }
 
     //  WRITE RESPONSE
@@ -43,6 +56,7 @@ exports.processRequest = async function(socket, bodyBuffer){
         + (success ? (' => '+responce) : "")
     )
 }
+
 
 const readValue = (string, name, parseFun, data)=>{
     let parts = string.split(":")

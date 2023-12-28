@@ -1,25 +1,27 @@
 exports.tables = {
     // WS CONFIG TABLES
-    'workspaces'   : {
-        fields:{
-            id:       'VARCHAR(32) NOT NULL',
-            name:     'VARCHAR(255) NOT NULL'
-        }, 
-        primary_key: 'id'
-    },
-    'modules'   : {
-        fields:{
-            wsid:     'VARCHAR(32) NOT NULL',
-            module:   'VARCHAR(32) NOT NULL',
-            params:   'TEXT'
-        }, 
-        primary_key:  'wsid,module'
-    },
+
     'hackers'   : {
         fields:{
-            time:     'BIGINT NOT NULL',
-            ip:       'VARCHAR(16) NOT NULL',
-            body:     'VARCHAR(255) NOT NULL'
+            time:       'BIGINT NOT NULL',
+            ip:         'VARCHAR(16) NOT NULL',
+            body:       'VARCHAR(255) NOT NULL'
         }, 
     },
+
+    'sensors'   : {
+        fields:{
+            time:       'BIGINT NOT NULL',
+            ip:         'VARCHAR(16) NOT NULL',
+
+            tempA:      'FLOAT NOT NULL',   // inside temperature 
+            tempTarget: 'FLOAT NOT NULL',   // target temperature
+            heating:    'TINYINT NOT NULL', // heating state
+            tempB:      'FLOAT NOT NULL',   // outside temperature
+            
+            reason:     'TINYINT NOT NULL'  // Log reason (1:start, 2:timer, 3:change)
+        }, 
+        primary_key: 'time'
+    },
+
 };

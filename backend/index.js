@@ -24,7 +24,7 @@ try{
     const server = net.createServer((socket) => {
 
         socket.on('data', (body) => { // do not async !
-            //processRequest (socket, "tempA:7.50 tempTarget:7.00 heating:0 tempB:1.81")//data);
+            //processRequest (socket, "tempA:7.50 tempTarget:7.00 heating:0 tempB:-1.81")
             processRequest(socket, body)
             .finally(()=>{
                 socket.end();
