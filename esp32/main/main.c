@@ -2,22 +2,32 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/idf_additions.h"
+#include "freertos/queue.h"
 #include "esp_log.h"
 
 
 static const char *TAG = "first";
+QueueHandle_t queue;
 
 void taskOne( void *pvParameters )
 {
     int coreID=13;
+    int msg = 13;
+    UBaseType_t waiting;
     
     for( ;; )
     {
         coreID = xPortGetCoreID();
+        waiting = uxQueueMessagesWaiting( queue );
 
-        ESP_LOGI(TAG, "Task One, coreID=%i", coreID);
+        ESP_LOGI(TAG, "Task One, coreID=%i  waiting=%i", coreID, waiting);
         //printf("MSG");
         vTaskDelay(250);
+
+        if(xQueueSend(queue, (void*)&msg, (TickType_t)1000 ) != pdPASS) ESP_LOGE(TAG, "Failed to post the message");
+        else ESP_LOGW(TAG, "message was sent");
+
+        
      }
 
     /* Tasks must not attempt to return from their implementing
@@ -60,6 +70,12 @@ void vOtherFunction( void )
     BaseType_t xReturned;
 
     TaskHandle_t xHandle = NULL;
+
+    // Create Queue
+    queue = xQueueCreate(5, sizeof (int));
+    if (queue == 0)  ESP_LOGE(TAG,"Queue not created");
+    else ESP_LOGI(TAG,"Queue created");
+
 
 
     /* Create the task, storing the handle. */
