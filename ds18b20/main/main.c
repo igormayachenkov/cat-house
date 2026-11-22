@@ -10,7 +10,7 @@
 static const char *TAG = "DS18B20";
 static uint8_t ledState = 0;
 #define GPIO_INPUT    5
-#define GPIO_OUTPUT  19
+#define GPIO_OUTPUT  17
 
 
 
@@ -131,9 +131,13 @@ void app_main(void)
             ESP_LOGE(TAG,"error code: %d",error);
         }else{
             // SUCCESS
+            // Convert signed 16-bit value (0.0625 °C per LSB)
+            int16_t raw = (int16_t)((buffer[1] << 8) | buffer[0]);
+            float temp = raw / 16.0f;
+
             ESP_LOGI(TAG, "Sensor [%d]: scratchpad: "
-                "temp: %02X %02X, alarm: %02X %02X, config: %02X, reserved: %02X %02X %02X", 
-                GPIO_INPUT, buffer[0], buffer[1], buffer[2], buffer[3], buffer[4], buffer[5], buffer[6], buffer[7]);
+                "temp: %.2f, alarm: %02X %02X, config: %02X, reserved: %02X %02X %02X", 
+                GPIO_INPUT, temp, buffer[2], buffer[3], buffer[4], buffer[5], buffer[6], buffer[7]);
         }
 
         // LED
